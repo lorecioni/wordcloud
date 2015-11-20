@@ -25,6 +25,7 @@ Stopwords : https://code.google.com/p/stop-words/
 	// Define option defaults
     var defaults = {	 
       text: '',
+      canvas : 'canvas',
       language: 'en',
       lowerCase: false,	  
       removeDigits: true
@@ -84,10 +85,10 @@ Stopwords : https://code.google.com/p/stop-words/
 	
 	for(var i = 0; i < keywords.length; i++){
 		var w = keywords[i];
-	  	if(!occurrencies.hasOwnProperty(w)){
+	  	if(!occurrences.hasOwnProperty(w)){
 			occurrences[w] = 1;
 		} else {
-			occurrences[w] = occurrencies[w] + 1;
+			occurrences[w] = occurrences[w] + 1;
 		}
 	}
 	
