@@ -5,4 +5,4 @@ var m = new WordCloud({
 	language : 'it'
 });
 
-console.log(m.getKeywords());
+m.build();

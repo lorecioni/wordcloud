@@ -80,18 +80,18 @@ Stopwords : https://code.google.com/p/stop-words/
   //Build the visual words cloud
   WordCloud.prototype.build = function(){
     var keywords = this.getKeywords();
-    var occurrencies = [];
+    var occurrences = [];
 	
 	for(var i = 0; i < keywords.length; i++){
 		var w = keywords[i];
 	  	if(!occurrencies.hasOwnProperty(w)){
-			occurrencies[w] = 1;
+			occurrences[w] = 1;
 		} else {
-			occurrencies[w] = occurrencies[w] + 1;
+			occurrences[w] = occurrencies[w] + 1;
 		}
 	}
 	
-	console.log(occurrencies);	  
+	console.log(occurrences);	  
   }
   	
 	
