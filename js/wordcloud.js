@@ -46,10 +46,10 @@ Stopwords : https://code.google.com/p/stop-words/
     var unchangedWords = [];
     var lowWords = [];
 	  
-    for(var x = 0;x < words.length; x++){
+    for(var x = 0; x < words.length; x++){
 	  //Remove punctuation
       var w = words[x].match(/https?:\/\/.*[\r\n]*/g) ? 
-	     words[x] : words[x].replace(/\.|,|;|!|\?|\(|\)|:|"|^'|'$/g,'');    
+	     words[x] : words[x].replace(/\.|,|;|!|\?|\(|\)|:|"|^'|.'|$/g,'');    
       // Remove single characters
       if(w.length === 1){
         w = w.replace(/-|_|@|&|#/g,'');
@@ -77,6 +77,22 @@ Stopwords : https://code.google.com/p/stop-words/
     return results;
   }
 
+  //Build the visual words cloud
+  WordCloud.prototype.build = function(){
+    var keywords = this.getKeywords();
+    var occurrencies = [];
+	
+	for(var i = 0; i < keywords.length; i++){
+		var w = keywords[i];
+	  	if(!occurrencies.hasOwnProperty(w)){
+			occurrencies[w] = 1;
+		} else {
+			occurrencies[w] = occurrencies[w] + 1;
+		}
+	}
+	
+	console.log(occurrencies);	  
+  }
   	
 	
 	
