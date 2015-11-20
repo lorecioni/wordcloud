@@ -26,6 +26,7 @@ Stopwords : https://code.google.com/p/stop-words/
     var defaults = {	 
       text: '',
       canvas : 'canvas',
+      dpi: 300,
       language: 'en',
       lowerCase: false,	  
       removeDigits: true
@@ -38,7 +39,7 @@ Stopwords : https://code.google.com/p/stop-words/
 	
 	//Set canvas
 	this.canvas = document.getElementById(this.options.canvas);
-	setCanvasDPI(this.canvas, 150);
+	setCanvasDPI(this.canvas, this.options.dpi);
 	this.context = canvas.getContext('2d');
 	
   }
@@ -51,10 +52,11 @@ Stopwords : https://code.google.com/p/stop-words/
 	  this.rate = rate;
 	  this.x = 30;
 	  this.y = 40;
-	  this.size = 10;
+	  this.size = 50 * rate;
 	  this.font = 'Arial';
   }
   
+  //Function for drawing word on canvas
   CanvasRenderingContext2D.prototype.drawWord = function (w) {
     this.textBaseline = 'top';
     this.font = w.size + 'px ' + w.font;
@@ -93,6 +95,7 @@ Stopwords : https://code.google.com/p/stop-words/
     }
     
 	var keywords = [];
+	this.maxFrequency = 0;
     var stopwords = getStopwords.call(this);
     for(var y = 0; y < lowWords.length; y++){
       if(stopwords.indexOf(lowWords[y]) < 0){
@@ -103,18 +106,24 @@ Stopwords : https://code.google.com/p/stop-words/
 		 } else {
 			keywords[resultWord] = keywords[resultWord] + 1;
 		 }
+		 if(keywords[resultWord] > this.maxFrequency){
+			this.maxFrequency = keywords[resultWord]; 
+		 }
       }
     }
 		
     return keywords;
   }
 
+  
   //Build the visual words cloud
   WordCloud.prototype.build = function(){
     var keywords = this.getKeywords();	
 	
 	for(word in keywords){
-		var w = new Word(word, '#023', keywords[word])
+		var rate = keywords[word] / this.maxFrequency;
+		rate = +(Math.round(rate + "e+" + 2)  + "e-" + 2);
+		var w = new Word(word, '#023', rate)
 		this.context.drawWord(w);
 	}
   }
