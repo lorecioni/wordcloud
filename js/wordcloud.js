@@ -19,7 +19,7 @@ Stopwords : https://code.google.com/p/stop-words/
 */
 
 (function() {
-  // Define our constructor
+  //Define WordCloud constructor
   this.WordCloud = function() {
     
 	// Define option defaults
@@ -34,9 +34,35 @@ Stopwords : https://code.google.com/p/stop-words/
     // Create options by extending defaults with the passed in arugments
     if (arguments[0] && typeof arguments[0] === "object") {
       this.options = extendDefaults(defaults, arguments[0]);
-    }	
+    }
+	
+	//Set canvas
+	this.canvas = document.getElementById(this.options.canvas);
+	setCanvasDPI(this.canvas, 150);
+	this.context = canvas.getContext('2d');
 	
   }
+  
+  //Define word constructor
+  this.Word = function(word, color, rate){
+	  //Set attributes
+  	  this.word = word;
+	  this.color = color;
+	  this.rate = rate;
+	  this.x = 30;
+	  this.y = 40;
+	  this.size = 10;
+	  this.font = 'Arial';
+  }
+  
+  CanvasRenderingContext2D.prototype.drawWord = function (w) {
+    this.textBaseline = 'top';
+    this.font = w.size + 'px ' + w.font;
+    this.fillStyle = w.color;
+    this.fillText(w.word, w.x, w.y);
+    return this;
+  }
+  
   
   /** -End constructor -- **/
   /*** Public methods ***/
@@ -66,38 +92,52 @@ Stopwords : https://code.google.com/p/stop-words/
       }
     }
     
-	var results = [];
+	var keywords = [];
     var stopwords = getStopwords.call(this);
     for(var y = 0; y < lowWords.length; y++){
       if(stopwords.indexOf(lowWords[y]) < 0){
         var resultWord = this.options.lowerCase && !unchangedWords[y].match(/https?:\/\/.*[\r\n]*/g) ? lowWords[y] : unchangedWords[y];
-        results.push(resultWord);
+		 // Build word occurrences
+        if(!keywords.hasOwnProperty(resultWord)){
+			keywords[resultWord] = 1;
+		 } else {
+			keywords[resultWord] = keywords[resultWord] + 1;
+		 }
       }
     }
 		
-    return results;
+    return keywords;
   }
 
   //Build the visual words cloud
   WordCloud.prototype.build = function(){
-    var keywords = this.getKeywords();
-    var occurrences = [];
+    var keywords = this.getKeywords();	
 	
-	for(var i = 0; i < keywords.length; i++){
-		var w = keywords[i];
-	  	if(!occurrences.hasOwnProperty(w)){
-			occurrences[w] = 1;
-		} else {
-			occurrences[w] = occurrences[w] + 1;
-		}
+	for(word in keywords){
+		var w = new Word(word, '#023', keywords[word])
+		this.context.drawWord(w);
 	}
-	
-	console.log(occurrences);	  
   }
   	
 	
 	
+	
+	
   /*** Private methods ***/
+  
+  function setCanvasDPI(canvas, dpi) {
+    if (!canvas.style.width)
+        canvas.style.width = canvas.width + 'px';
+    if (!canvas.style.height)
+        canvas.style.height = canvas.height + 'px';
+
+    var scaleFactor = dpi / 96;
+    canvas.width = Math.ceil(canvas.width * scaleFactor);
+    canvas.height = Math.ceil(canvas.height * scaleFactor);
+    var ctx = canvas.getContext('2d');
+    ctx.scale(scaleFactor, scaleFactor);
+	console.log('Setting canvas DPI to ' + dpi);
+  }
 
   // Overrides default options
   function extendDefaults(source, properties) {
