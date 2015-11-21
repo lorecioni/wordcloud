@@ -6,3 +6,6 @@ body {
   padding-bottom: 30px;
 }
 
+#canvas {
+	border: 1px solid;
+}
