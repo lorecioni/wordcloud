@@ -38,14 +38,17 @@ Stopwords : https://code.google.com/p/stop-words/
       this.options = extendDefaults(defaults, arguments[0]);
     }
 	
-	//Initializa canvas
+	//Initialize canvas
 	this.canvas = document.getElementById(this.options.canvas);
 	this.context = canvas.getContext('2d');
 	setCanvasDPI(this.canvas, this.options.dpi);
 	this.context.rect(0, 0, this.canvas.width, this.canvas.height);
 	this.context.fillStyle = this.options.backgroundColor;
 	this.context.fill();
-
+	//Array of occupied pixels
+    var canvasWidth = this.canvas.width/(this.options.dpi/96);	
+    var canvasHeight = this.canvas.height/(this.options.dpi/96);
+    this.occupied = createMatrix(canvasWidth, canvasHeight);
   }
   
   //Define word constructor
@@ -111,16 +114,26 @@ Stopwords : https://code.google.com/p/stop-words/
   
   //Function for drawing word on canvas
   CanvasRenderingContext2D.prototype.drawWord = function (w) {
-    this.textBaseline = 'top';
+    this.textBaseline = 'middle';
     this.font = w.size + 'px ' + w.font;
-    var textDim = this.measureText(w.text).width;
     this.fillStyle = w.color;
-    this.fillText(w.text, w.x, w.y);
-    return textDim;
+    this.fillText(w.text, w.x + w.size * 0.5, w.y);
+    return true;
   }
-  
-  CanvasRenderingContext2D.prototype.check = function(){
-	  
+    
+  CanvasRenderingContext2D.prototype.getNewPosition = function(w, offsetX, offsetY){
+    this.font = w.size + 'px ' + w.font;
+    var width = this.measureText(w.text).width;
+    var textDim = {
+      width: width,
+      height: w.size		
+    };
+	
+	
+	
+	
+	
+    return textDim;
   }
   
   //Build the visual words cloud
@@ -129,13 +142,14 @@ Stopwords : https://code.google.com/p/stop-words/
 	var canvasWidth = this.canvas.width/(this.options.dpi/96);
 	var canvasHeight = this.canvas.height/(this.options.dpi/96);
 	var offsetX = canvasWidth/2;
-	var offsetY = canvasHeight/4;
+	var offsetY = canvasHeight/2;
+
 	for(word in keywords){
 		var rate = keywords[word] / this.maxFrequency;
 		rate = +(Math.round(rate + "e+" + 2)  + "e-" + 2);
 		var w = new Word(word, getWordColor.call(this), rate, offsetX, offsetY)
 		var previousWidth = this.context.drawWord(w);
-		offsetX += previousWidth;
+		//offsetX += previousWidth;
 	}
   }
   	
@@ -166,6 +180,16 @@ Stopwords : https://code.google.com/p/stop-words/
     }
     return source;
   }
+  
+  function createMatrix(length) {
+    var arr = new Array(length || 0),
+        i = length;
+    if (arguments.length > 1) {
+      var args = Array.prototype.slice.call(arguments, 1);
+      while(i--) arr[length-1 - i] = createMatrix.apply(this, args);
+    }
+     return arr;
+   }
   
   //Returning random color
   function getWordColor(){
